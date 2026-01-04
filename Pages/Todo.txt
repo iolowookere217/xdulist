@@ -1,0 +1,275 @@
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { motion } from 'framer-motion';
+import { Plus, CheckCircle2, Clock, ListTodo } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import TodoItem from '@/components/todo/TodoItem';
+import AddTodoModal from '@/components/todo/AddTodoModal';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+
+export default function Todo() {
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingTodo, setEditingTodo] = useState(null);
+  const [deletingTodo, setDeletingTodo] = useState(null);
+  const [user, setUser] = useState(null);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const u = await base44.auth.me();
+        setUser(u);
+      } catch {
+        // Not logged in
+      }
+    };
+    loadUser();
+  }, []);
+
+  const { data: todos = [], isLoading } = useQuery({
+    queryKey: ['todos'],
+    queryFn: () => base44.entities.Todo.list('start_time', 500),
+  });
+
+  const createTodoMutation = useMutation({
+    mutationFn: (data) => base44.entities.Todo.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
+      setShowAddModal(false);
+      checkAndSendReminders();
+    },
+  });
+
+  const updateTodoMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.Todo.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
+      setShowAddModal(false);
+      setEditingTodo(null);
+    },
+  });
+
+  const deleteTodoMutation = useMutation({
+    mutationFn: (id) => base44.entities.Todo.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
+      setDeletingTodo(null);
+    },
+  });
+
+  const handleSubmit = (data) => {
+    if (editingTodo) {
+      updateTodoMutation.mutate({ id: editingTodo.id, data });
+    } else {
+      createTodoMutation.mutate(data);
+    }
+  };
+
+  const handleToggle = (todo) => {
+    updateTodoMutation.mutate({
+      id: todo.id,
+      data: { ...todo, is_completed: !todo.is_completed }
+    });
+  };
+
+  const handleEdit = (todo) => {
+    setEditingTodo(todo);
+    setShowAddModal(true);
+  };
+
+  const handleDelete = (todo) => {
+    setDeletingTodo(todo);
+  };
+
+  const checkAndSendReminders = () => {
+    const now = new Date();
+    todos.forEach(todo => {
+      if (!todo.reminder_sent && !todo.is_completed) {
+        const [hours, minutes] = todo.start_time.split(':');
+        const startTime = new Date();
+        startTime.setHours(parseInt(hours), parseInt(minutes), 0);
+        
+        const reminderTime = new Date(startTime.getTime() - 30 * 60 * 1000); // 30 mins before
+        
+        if (now >= reminderTime && now < startTime) {
+          // Show browser notification
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Todo Reminder', {
+              body: `${todo.description} starts in 30 minutes`,
+              icon: '/icon.png'
+            });
+          }
+          // Mark reminder as sent
+          updateTodoMutation.mutate({
+            id: todo.id,
+            data: { ...todo, reminder_sent: true }
+          });
+        }
+      }
+    });
+  };
+
+  // Request notification permission on mount
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  // Check for reminders every minute
+  useEffect(() => {
+    const interval = setInterval(checkAndSendReminders, 60000);
+    return () => clearInterval(interval);
+  }, [todos]);
+
+  const pendingTodos = todos.filter(t => !t.is_completed);
+  const completedTodos = todos.filter(t => t.is_completed);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 pt-8 pb-20 px-4">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-lg mx-auto"
+        >
+          <div className="flex items-center gap-2 text-blue-100 mb-1">
+            <ListTodo className="w-5 h-5" />
+            <p className="text-sm">Your Tasks</p>
+          </div>
+          <h1 className="text-xl font-bold text-white">Todo List</h1>
+        </motion.div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-lg mx-auto px-4 -mt-12 pb-28">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 gap-3 mb-5">
+          <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-2">
+                <Clock className="w-5 h-5 text-white" />
+              </div>
+              <p className="text-xs font-medium text-gray-500 mb-1">Pending</p>
+              <p className="text-lg font-bold text-gray-900">{pendingTodos.length}</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mb-2">
+                <CheckCircle2 className="w-5 h-5 text-white" />
+              </div>
+              <p className="text-xs font-medium text-gray-500 mb-1">Completed</p>
+              <p className="text-lg font-bold text-gray-900">{completedTodos.length}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Pending Todos */}
+        {pendingTodos.length > 0 && (
+          <div className="mb-5">
+            <h3 className="text-base font-semibold text-gray-900 mb-3">Pending Tasks</h3>
+            <div className="space-y-2">
+              {pendingTodos.map((todo, index) => (
+                <TodoItem
+                  key={todo.id}
+                  todo={todo}
+                  index={index}
+                  onToggle={handleToggle}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Completed Todos */}
+        {completedTodos.length > 0 && (
+          <div>
+            <h3 className="text-base font-semibold text-gray-900 mb-3">Completed Tasks</h3>
+            <div className="space-y-2">
+              {completedTodos.map((todo, index) => (
+                <TodoItem
+                  key={todo.id}
+                  todo={todo}
+                  index={index}
+                  onToggle={handleToggle}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {todos.length === 0 && !isLoading && (
+          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+            <ListTodo className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500">No todos yet</p>
+            <p className="text-sm text-gray-400 mt-1">Tap the + button to add your first task</p>
+          </div>
+        )}
+      </div>
+
+      {/* Quick Add Button */}
+      <motion.button
+        onClick={() => {
+          setEditingTodo(null);
+          setShowAddModal(true);
+        }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="fixed bottom-20 right-4 z-30 w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full shadow-lg flex items-center justify-center text-white md:bottom-6 md:right-6"
+      >
+        <Plus className="w-6 h-6" />
+      </motion.button>
+
+      {/* Add/Edit Todo Modal */}
+      <AddTodoModal
+        isOpen={showAddModal}
+        onClose={() => {
+          setShowAddModal(false);
+          setEditingTodo(null);
+        }}
+        onSubmit={handleSubmit}
+        isLoading={createTodoMutation.isPending || updateTodoMutation.isPending}
+        editTodo={editingTodo}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deletingTodo} onOpenChange={() => setDeletingTodo(null)}>
+        <AlertDialogContent className="rounded-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Todo?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this todo.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-lg">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteTodoMutation.mutate(deletingTodo.id)}
+              disabled={deleteTodoMutation.isPending}
+              className="rounded-lg bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}

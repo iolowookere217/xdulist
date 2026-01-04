@@ -1,0 +1,86 @@
+import React, { useState } from 'react';
+import { Mic, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+
+export default function VoiceInputSmall({ onTranscript, disabled, className }) {
+  const [isListening, setIsListening] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const startListening = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Voice input is not supported in your browser');
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setIsProcessing(true);
+      onTranscript(transcript);
+      setTimeout(() => setIsProcessing(false), 500);
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+      setIsProcessing(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.start();
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={startListening}
+      disabled={disabled || isListening || isProcessing}
+      className={cn(
+        "p-2 rounded-lg transition-all",
+        isListening 
+          ? "bg-red-100 text-red-600" 
+          : "hover:bg-slate-100 text-slate-400 hover:text-slate-600",
+        (disabled || isProcessing) && "opacity-50 cursor-not-allowed",
+        className
+      )}
+    >
+      <AnimatePresence mode="wait">
+        {isProcessing ? (
+          <motion.div
+            key="processing"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+          >
+            <Loader2 className="w-4 h-4 animate-spin" />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="idle"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+          >
+            <Mic className={cn(
+              "w-4 h-4",
+              isListening && "animate-pulse"
+            )} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </button>
+  );
+}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Welcome to MoneyMata</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+      body {
+        margin: 0;
+        padding: 0;
+        min-width: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        background-color: #f5f5f5;
+        color: #333333;
+      }
+      a {
+        color: #3b82f6;
+        text-decoration: none;
+      }
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.25;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #ffffff;
+      }
+      p {
+        margin-top: 0;
+        margin-bottom: 16px;
+      }
+      .email-wrapper {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .email-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        padding: 40px 24px;
+        color: #ffffff;
+      }
+      .logo {
+        font-size: 32px;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+      .email-body {
+        padding: 40px 32px;
+        background-color: #ffffff;
+      }
+      .email-footer {
+        background-color: #f9fafb;
+        padding: 24px 32px;
+        text-align: center;
+        font-size: 14px;
+        color: #6b7280;
+        border-top: 1px solid #e5e7eb;
+      }
+      .button {
+        display: inline-block;
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        padding: 14px 32px;
+        border-radius: 8px;
+        margin: 24px 0;
+      }
+      .feature-box {
+        background-color: #f0f9ff;
+        padding: 16px;
+        border-radius: 8px;
+        margin: 16px 0;
+        border-left: 4px solid #3b82f6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-wrapper">
+      <div class="email-header">
+        <div class="logo">💰 MoneyMata</div>
+        <h1>Welcome Aboard!</h1>
+      </div>
+      <div class="email-body">
+        <p>Hello <strong><%= userName %></strong>,</p>
+        <p>
+          🎉 Welcome to MoneyMata! Your account is now fully activated and ready
+          to use.
+        </p>
+        <p>
+          MoneyMata is your smart expense tracking companion, designed to help
+          you take control of your finances with ease.
+        </p>
+
+        <div class="feature-box">
+          <h3 style="margin-top: 0; color: #1e40af">
+            ✨ What you can do with MoneyMata:
+          </h3>
+          <ul style="margin-bottom: 0; line-height: 1.8">
+            <li>
+              <strong>Voice Input:</strong> Quickly add expenses using voice
+              commands
+            </li>
+            <li>
+              <strong>Receipt Scanning:</strong> Scan receipts with AI-powered
+              OCR
+            </li>
+            <li>
+              <strong>Smart Analytics:</strong> Get insights into your spending
+              patterns
+            </li>
+            <li>
+              <strong>Todo Management:</strong> Track tasks with voice-enabled
+              reminders
+            </li>
+            <li>
+              <strong>Multi-Currency:</strong> Support for NGN, USD, and GBP
+            </li>
+          </ul>
+        </div>
+
+        <p style="text-align: center; margin-top: 32px">
+          <a href="<%= dashboardUrl %>" class="button">Go to Dashboard</a>
+        </p>
+
+        <p style="margin-top: 32px">
+          Need help getting started? Check out our quick tips:
+        </p>
+        <ul style="line-height: 1.8">
+          <li>Use the <strong>+ button</strong> to quickly add expenses</li>
+          <li>Try the <strong>microphone icon</strong> for voice input</li>
+          <li>Upload receipts to auto-fill expense details</li>
+          <li>Set up todos with voice commands like "Call mom at 5pm"</li>
+        </ul>
+
+        <p style="margin-top: 24px">Happy tracking! 💪</p>
+      </div>
+      <div class="email-footer">
+        <p>Questions? We're here to help!</p>
+        <p>
+          Contact us at
+          <a href="mailto:support@moneymata.com">support@moneymata.com</a>
+        </p>
+        <p style="margin-top: 16px">
+          &copy; 2025 MoneyMata. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

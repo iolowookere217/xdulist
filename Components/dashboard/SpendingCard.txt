@@ -1,0 +1,49 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import { TrendingUp, TrendingDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export default function SpendingCard({ 
+  title, 
+  amount, 
+  trend, 
+  trendLabel,
+  icon: Icon,
+  gradient = 'from-emerald-500 to-teal-600',
+  delay = 0,
+  currency = 'NGN'
+}) {
+  const isPositiveTrend = trend >= 0;
+  
+  const currencySymbols = {
+    'NGN': '₦',
+    'USD': '$',
+    'GBP': '£'
+  };
+  
+  const symbol = currencySymbols[currency] || '₦';
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm"
+    >
+      <div className="flex flex-col items-center text-center">
+        {Icon && (
+          <div className={cn(
+            "w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center mb-2",
+            gradient
+          )}>
+            <Icon className="w-5 h-5 text-white" />
+          </div>
+        )}
+        <p className="text-xs font-medium text-gray-500 mb-1">{title}</p>
+        <p className="text-lg font-bold text-gray-900">
+          {symbol}{amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+        </p>
+      </div>
+    </motion.div>
+  );
+}

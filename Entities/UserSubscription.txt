@@ -1,0 +1,56 @@
+{
+  "name": "UserSubscription",
+  "type": "object",
+  "properties": {
+    "tier": {
+      "type": "string",
+      "enum": [
+        "free",
+        "premium"
+      ],
+      "default": "free"
+    },
+    "receipts_scanned_this_month": {
+      "type": "number",
+      "default": 0
+    },
+    "month_reset_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "monthly_budget": {
+      "type": "number",
+      "description": "User's monthly budget limit"
+    },
+    "preferred_currency": {
+      "type": "string",
+      "default": "USD"
+    },
+    "notification_settings": {
+      "type": "object",
+      "properties": {
+        "spending_alerts": {
+          "type": "boolean",
+          "default": true
+        },
+        "weekly_summary": {
+          "type": "boolean",
+          "default": true
+        },
+        "budget_warnings": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "custom_categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "tier"
+  ]
+}

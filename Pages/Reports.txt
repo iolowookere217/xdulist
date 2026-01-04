@@ -1,0 +1,129 @@
+import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { motion } from 'framer-motion';
+import { ArrowLeft, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { format, subMonths, addMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { Button } from '@/components/ui/button';
+
+import MonthlyReport from '@/components/reports/MonthlyReport';
+import SpendingChart from '@/components/dashboard/SpendingChart';
+
+export default function Reports() {
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const u = await base44.auth.me();
+        setUser(u);
+      } catch {
+        // Not logged in
+      }
+    };
+    loadUser();
+  }, []);
+
+  const { data: expenses = [] } = useQuery({
+    queryKey: ['expenses'],
+    queryFn: () => base44.entities.Expense.list('-date', 500),
+  });
+
+  const { data: subscriptions = [] } = useQuery({
+    queryKey: ['subscription'],
+    queryFn: () => base44.entities.UserSubscription.filter({ created_by: user?.email }),
+    enabled: !!user?.email,
+  });
+
+  const subscription = subscriptions[0] || { tier: 'free' };
+  const isPremium = subscription.tier === 'premium';
+
+  const navigateMonth = (direction) => {
+    setSelectedMonth(prev => direction === 'next' ? addMonths(prev, 1) : subMonths(prev, 1));
+  };
+
+  const canGoNext = selectedMonth < new Date();
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-20">
+        <div className="max-w-lg mx-auto px-4 py-4">
+          <div className="flex items-center gap-3">
+            <Link 
+              to={createPageUrl('Home')}
+              className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </Link>
+            <h1 className="text-xl font-bold text-gray-900">Reports</h1>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-lg mx-auto px-4 py-6 pb-28">
+        {/* Month Navigator */}
+        <div className="flex items-center justify-between mb-6 bg-white rounded-lg p-3 border border-gray-200">
+          <button
+            onClick={() => navigateMonth('prev')}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5 text-gray-600" />
+          </button>
+          <span className="font-semibold text-gray-900">
+            {format(selectedMonth, 'MMMM yyyy')}
+          </span>
+          <button
+            onClick={() => navigateMonth('next')}
+            disabled={!canGoNext}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
+
+        {/* Monthly Report */}
+        <MonthlyReport expenses={expenses} selectedMonth={selectedMonth} />
+
+        {/* 30-Day Trend */}
+        <div className="mt-6">
+          <SpendingChart expenses={expenses} period={30} />
+        </div>
+
+        {/* Premium Features Teaser */}
+        {!isPremium && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mt-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-5 border border-blue-100"
+          >
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-blue-100">
+                <Lock className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-semibold text-gray-900">
+                  Advanced Reports
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Unlock spending forecasts, trend predictions, and detailed analytics with Premium.
+                </p>
+                <Link to={createPageUrl('Settings')}>
+                  <Button
+                    className="mt-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-lg"
+                  >
+                    Upgrade to Premium
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}

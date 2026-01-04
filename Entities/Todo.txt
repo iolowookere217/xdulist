@@ -1,0 +1,28 @@
+{
+  "name": "Todo",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Todo description"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Time in HH:mm format (e.g., 17:20)"
+    },
+    "is_completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the todo is completed"
+    },
+    "reminder_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether reminder has been sent"
+    }
+  },
+  "required": [
+    "description",
+    "start_time"
+  ]
+}

@@ -1,0 +1,186 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Loader2, Calendar, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import VoiceInputSmall from '../expenses/VoiceInputSmall';
+import { base44 } from '@/api/base44Client';
+
+export default function AddTodoModal({ 
+  isOpen, 
+  onClose, 
+  onSubmit, 
+  isLoading,
+  editTodo = null 
+}) {
+  const [formData, setFormData] = useState({
+    description: '',
+    start_time: ''
+  });
+  const [isProcessingVoice, setIsProcessingVoice] = useState(false);
+
+  useEffect(() => {
+    if (editTodo) {
+      setFormData({
+        description: editTodo.description,
+        start_time: editTodo.start_time
+      });
+    } else {
+      setFormData({
+        description: '',
+        start_time: ''
+      });
+    }
+  }, [editTodo, isOpen]);
+
+  const handleVoiceTranscript = async (transcript) => {
+    setIsProcessingVoice(true);
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Extract the task description and time from: "${transcript}"
+        
+        Examples:
+        - "go to the market by 5:20pm" → description: "go to the market", time: "17:20"
+        - "meeting at 2:30pm" → description: "meeting", time: "14:30"
+        - "call mom at 8am" → description: "call mom", time: "08:00"
+        
+        Return the time in 24-hour format (HH:mm).`,
+        response_json_schema: {
+          type: 'object',
+          properties: {
+            description: { type: 'string' },
+            time: { type: 'string' }
+          }
+        }
+      });
+      
+      setFormData(prev => ({
+        description: result.description || transcript,
+        start_time: result.time || prev.start_time
+      }));
+    } catch (error) {
+      setFormData(prev => ({ ...prev, description: transcript }));
+    }
+    setIsProcessingVoice(false);
+  };
+
+  const handleTimeVoiceTranscript = async (transcript) => {
+    setIsProcessingVoice(true);
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Extract only the time from: "${transcript}". Return in 24-hour format (HH:mm).
+        
+        Examples: "5:20pm" → "17:20", "2pm" → "14:00", "8:30am" → "08:30"`,
+        response_json_schema: {
+          type: 'object',
+          properties: {
+            time: { type: 'string' }
+          }
+        }
+      });
+      
+      setFormData(prev => ({ ...prev, start_time: result.time || prev.start_time }));
+    } catch (error) {
+      console.error('Time parsing error:', error);
+    }
+    setIsProcessingVoice(false);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.description || !formData.start_time) return;
+    
+    onSubmit(formData);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ y: '100%', opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: '100%', opacity: 0 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          onClick={(e) => e.stopPropagation()}
+          className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto"
+        >
+          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">
+              {editTodo ? 'Edit Todo' : 'Add Todo'}
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            {/* Description */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">What needs to be done? *</Label>
+              <div className="relative">
+                <Input
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="e.g. go to the market by 5:20pm"
+                  className="h-12 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-blue-500 pr-12"
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                  <VoiceInputSmall 
+                    onTranscript={handleVoiceTranscript}
+                    disabled={isProcessingVoice}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Start Time */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">Start Time *</Label>
+              <div className="relative">
+                <Input
+                  type="time"
+                  value={formData.start_time}
+                  onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
+                  className="h-12 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-blue-500 pr-12"
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                  <VoiceInputSmall 
+                    onTranscript={handleTimeVoiceTranscript}
+                    disabled={isProcessingVoice}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-gray-500">
+                You'll be reminded 30 minutes before this time
+              </p>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isLoading || !formData.description || !formData.start_time}
+              className="w-full h-12 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium text-base"
+            >
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                editTodo ? 'Update Todo' : 'Add Todo'
+              )}
+            </Button>
+          </form>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}

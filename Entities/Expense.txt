@@ -1,0 +1,59 @@
+{
+  "name": "Expense",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Description of the expense"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Amount spent"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "groceries",
+        "transport",
+        "dining",
+        "entertainment",
+        "utilities",
+        "healthcare",
+        "shopping",
+        "travel",
+        "education",
+        "subscriptions",
+        "other"
+      ],
+      "description": "Expense category"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time of expense"
+    },
+    "receipt_url": {
+      "type": "string",
+      "description": "URL of uploaded receipt image"
+    },
+    "currency": {
+      "type": "string",
+      "default": "NGN",
+      "enum": [
+        "NGN",
+        "USD",
+        "GBP"
+      ],
+      "description": "Currency code"
+    },
+    "is_recurring": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "description",
+    "amount",
+    "date"
+  ]
+}

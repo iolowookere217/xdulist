@@ -1,0 +1,73 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import { categoryConfig } from '../expenses/CategoryBadge';
+
+export default function CategoryBreakdown({ expenses }) {
+  const categoryTotals = expenses.reduce((acc, exp) => {
+    acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
+    return acc;
+  }, {});
+
+  const totalSpent = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
+  
+  const sortedCategories = Object.entries(categoryTotals)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5);
+
+  if (sortedCategories.length === 0) {
+    return (
+      <div className="bg-white rounded-3xl p-6 border border-slate-100">
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">Top Categories</h3>
+        <p className="text-slate-500 text-sm text-center py-8">No expenses yet</p>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+      className="bg-white rounded-lg p-5 border border-gray-200 shadow-sm"
+    >
+      <h3 className="text-base font-semibold text-gray-900 mb-4">Top Categories</h3>
+      <div className="space-y-4">
+        {sortedCategories.map(([category, amount], index) => {
+          const config = categoryConfig[category] || categoryConfig.other;
+          const Icon = config.icon;
+          const percentage = (amount / totalSpent) * 100;
+          
+          return (
+            <motion.div
+              key={category}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 * index }}
+              className="space-y-2"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`p-1.5 rounded-lg ${config.color.split(' ')[0]}`}>
+                    <Icon className={`w-3.5 h-3.5 ${config.color.split(' ')[1]}`} />
+                  </div>
+                  <span className="text-sm font-medium text-slate-700 capitalize">{category}</span>
+                </div>
+                <span className="text-sm font-semibold text-slate-900">
+                  ${amount.toFixed(2)}
+                </span>
+              </div>
+              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${percentage}%` }}
+                  transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+                  className={`h-full rounded-full ${config.color.split(' ')[0].replace('100', '400')}`}
+                />
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}

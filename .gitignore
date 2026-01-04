@@ -1,0 +1,6 @@
+GOOGLE_OAUTH_SETUP.md
+node_modules
+.env
+serviceAccountKey.json
+.next
+.DS_Store

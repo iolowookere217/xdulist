@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MoneyMata Weekly Summary</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+      body {
+        margin: 0;
+        padding: 0;
+        min-width: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        background-color: #f5f5f5;
+        color: #333333;
+      }
+      a {
+        color: #3b82f6;
+        text-decoration: none;
+      }
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.25;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #ffffff;
+      }
+      h2 {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 24px 0 12px;
+        color: #1f2937;
+      }
+      p {
+        margin-top: 0;
+        margin-bottom: 16px;
+      }
+      .email-wrapper {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .email-header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        padding: 40px 24px;
+        color: #ffffff;
+      }
+      .logo {
+        font-size: 32px;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+      .email-body {
+        padding: 40px 32px;
+        background-color: #ffffff;
+      }
+      .email-footer {
+        background-color: #f9fafb;
+        padding: 24px 32px;
+        text-align: center;
+        font-size: 14px;
+        color: #6b7280;
+        border-top: 1px solid #e5e7eb;
+      }
+      .stat-box {
+        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+        padding: 20px;
+        border-radius: 8px;
+        margin: 16px 0;
+        text-align: center;
+      }
+      .stat-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: #1e40af;
+        margin: 8px 0;
+      }
+      .stat-label {
+        font-size: 14px;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 24px 0;
+      }
+      .mini-stat {
+        background-color: #f3f4f6;
+        padding: 16px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .mini-stat-value {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+      .mini-stat-label {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
+      }
+      .trend {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-left: 8px;
+      }
+      .trend-up {
+        background-color: #fee2e2;
+        color: #dc2626;
+      }
+      .trend-down {
+        background-color: #dcfce7;
+        color: #16a34a;
+      }
+      .button {
+        display: inline-block;
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        padding: 14px 32px;
+        border-radius: 8px;
+        margin: 24px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-wrapper">
+      <div class="email-header">
+        <div class="logo">💰 MoneyMata</div>
+        <h1>Your Weekly Summary</h1>
+      </div>
+      <div class="email-body">
+        <p>Hello <strong><%= userName %></strong>,</p>
+        <p>Here's your spending summary for this week:</p>
+
+        <div class="stat-box">
+          <div class="stat-label">Total Spent This Week</div>
+          <div class="stat-value">$<%= totalSpent.toFixed(2) %></div>
+          <% if (weeklyChange !== 0) { %>
+            <span class="trend <%= weeklyChange > 0 ? 'trend-up' : 'trend-down' %>">
+              <%= weeklyChange > 0 ? '+' : '' %><%= weeklyChange.toFixed(1) %>% vs last week
+            </span>
+          <% } %>
+        </div>
+
+        <div class="stats-grid">
+          <div class="mini-stat">
+            <div class="mini-stat-value"><%= transactionCount %></div>
+            <div class="mini-stat-label">Transactions</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-value"><%= topCategory %></div>
+            <div class="mini-stat-label">Top Category</div>
+          </div>
+        </div>
+
+        <h2>📊 Key Insights</h2>
+        <ul style="line-height: 1.8;">
+          <% if (weeklyChange > 10) { %>
+            <li>📈 Your spending increased by <%= weeklyChange.toFixed(1) %>% this week</li>
+          <% } else if (weeklyChange < -10) { %>
+            <li>📉 Great job! You spent <%= Math.abs(weeklyChange).toFixed(1) %>% less this week</li>
+          <% } %>
+          <li>🏆 Most of your spending was on <strong><%= topCategory %></strong></li>
+          <li>💳 Average transaction: $<%= (totalSpent / transactionCount).toFixed(2) %></li>
+        </ul>
+
+        <p style="margin-top: 32px;">Keep tracking your expenses to stay on budget and achieve your financial goals!</p>
+
+        <p style="text-align: center;">
+          <a href="<%= dashboardUrl %>" class="button">View Full Report</a>
+        </p>
+      </div>
+      <div class="email-footer">
+        <p>This is your weekly summary from MoneyMata Premium.</p>
+        <p>If you have any questions, contact us at <a href="mailto:support@moneymata.com">support@moneymata.com</a></p>
+        <p style="margin-top: 16px;">&copy; 2025 MoneyMata. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>
