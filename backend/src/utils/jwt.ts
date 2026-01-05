@@ -1,11 +1,11 @@
-import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
-import { Types } from 'mongoose';
+import jwt, { Secret } from "jsonwebtoken";
+import crypto from "crypto";
+import { Types } from "mongoose";
 
 export interface JWTPayload {
   userId: string;
   email: string;
-  tier: 'free' | 'premium';
+  tier: "free" | "premium";
 }
 
 export interface TokenPair {
@@ -16,19 +16,20 @@ export interface TokenPair {
 // Generate access token (short-lived)
 export const generateAccessToken = (payload: JWTPayload): string => {
   const secret = process.env.JWT_SECRET;
-  const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
+  const expiresIn = process.env.JWT_EXPIRES_IN || "15m";
 
   if (!secret) {
-    throw new Error('JWT_SECRET is not defined');
+    throw new Error("JWT_SECRET is not defined");
   }
 
-  return jwt.sign(payload, secret, { expiresIn });
+  // cast to any to satisfy various `jsonwebtoken` overload typings
+  return jwt.sign(payload as any, secret as any, { expiresIn } as any);
 };
 
 // Generate refresh token (long-lived)
 export const generateRefreshToken = (): string => {
   // Generate a random 64-byte token
-  return crypto.randomBytes(64).toString('hex');
+  return crypto.randomBytes(64).toString("hex");
 };
 
 // Verify access token
@@ -36,7 +37,7 @@ export const verifyAccessToken = (token: string): JWTPayload => {
   const secret = process.env.JWT_SECRET;
 
   if (!secret) {
-    throw new Error('JWT_SECRET is not defined');
+    throw new Error("JWT_SECRET is not defined");
   }
 
   try {
@@ -44,10 +45,10 @@ export const verifyAccessToken = (token: string): JWTPayload => {
     return decoded;
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      throw new Error('Token expired');
+      throw new Error("Token expired");
     }
     if (error instanceof jwt.JsonWebTokenError) {
-      throw new Error('Invalid token');
+      throw new Error("Invalid token");
     }
     throw error;
   }
@@ -68,7 +69,7 @@ export const generateTokenPair = (payload: JWTPayload): TokenPair => {
 
   return {
     accessToken,
-    refreshToken
+    refreshToken,
   };
 };
 
@@ -80,9 +81,9 @@ export const extractTokenFromHeader = (
     return null;
   }
 
-  const parts = authorizationHeader.split(' ');
+  const parts = authorizationHeader.split(" ");
 
-  if (parts.length !== 2 || parts[0] !== 'Bearer') {
+  if (parts.length !== 2 || parts[0] !== "Bearer") {
     return null;
   }
 

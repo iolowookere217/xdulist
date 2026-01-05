@@ -1,5 +1,5 @@
-import mongoose, { Document, Schema, Types } from 'mongoose';
-import crypto from 'crypto';
+import mongoose, { Document, Schema, Types, Model } from "mongoose";
+import crypto from "crypto";
 
 export interface IRefreshToken extends Document {
   userId: Types.ObjectId;
@@ -13,32 +13,32 @@ const refreshTokenSchema = new Schema<IRefreshToken>(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: [true, 'User ID is required']
+      ref: "User",
+      required: [true, "User ID is required"],
     },
     token: {
       type: String,
-      required: [true, 'Token is required']
+      required: [true, "Token is required"],
     },
     expiresAt: {
       type: Date,
-      required: [true, 'Expiration date is required']
-    }
+      required: [true, "Expiration date is required"],
+    },
   },
   {
-    timestamps: { createdAt: true, updatedAt: false }
+    timestamps: { createdAt: true, updatedAt: false },
   }
 );
 
 // Hash token before saving
-refreshTokenSchema.pre('save', async function (next) {
-  if (!this.isModified('token') || !this.isNew) {
+refreshTokenSchema.pre("save", async function (next) {
+  if (!this.isModified("token") || !this.isNew) {
     return next();
   }
 
   try {
     // Hash the token using SHA-256
-    this.token = crypto.createHash('sha256').update(this.token).digest('hex');
+    this.token = crypto.createHash("sha256").update(this.token).digest("hex");
     next();
   } catch (error: any) {
     next(error);
@@ -52,7 +52,7 @@ refreshTokenSchema.methods.isValid = function (): boolean {
 
 // Static method to hash a token for comparison
 refreshTokenSchema.statics.hashToken = function (token: string): string {
-  return crypto.createHash('sha256').update(token).digest('hex');
+  return crypto.createHash("sha256").update(token).digest("hex");
 };
 
 // Indexes - defined here explicitly instead of in field definitions
@@ -62,7 +62,11 @@ refreshTokenSchema.index({ userId: 1 });
 // TTL index to automatically delete expired tokens after 24 hours
 refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 86400 });
 
-export const RefreshToken = mongoose.model<IRefreshToken>(
-  'RefreshToken',
+interface RefreshTokenModel extends Model<IRefreshToken> {
+  hashToken(token: string): string;
+}
+
+export const RefreshToken = mongoose.model<IRefreshToken, RefreshTokenModel>(
+  "RefreshToken",
   refreshTokenSchema
 );
