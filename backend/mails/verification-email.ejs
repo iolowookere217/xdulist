@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MoneyMata Email Verification</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+      body {
+        margin: 0;
+        padding: 0;
+        min-width: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        background-color: #f5f5f5;
+        color: #333333;
+      }
+      a {
+        color: #3b82f6;
+        text-decoration: none;
+      }
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.25;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #ffffff;
+      }
+      p {
+        margin-top: 0;
+        margin-bottom: 16px;
+      }
+      .email-wrapper {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .email-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        padding: 40px 24px;
+        color: #ffffff;
+      }
+      .logo {
+        font-size: 32px;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+      .email-body {
+        padding: 40px 32px;
+        background-color: #ffffff;
+      }
+      .email-footer {
+        background-color: #f9fafb;
+        padding: 24px 32px;
+        text-align: center;
+        font-size: 14px;
+        color: #6b7280;
+        border-top: 1px solid #e5e7eb;
+      }
+      .button {
+        display: inline-block;
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        padding: 14px 32px;
+        border-radius: 8px;
+        margin: 24px 0;
+      }
+      .button:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      }
+      .link-box {
+        background-color: #f3f4f6;
+        padding: 12px;
+        border-radius: 6px;
+        word-break: break-all;
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 16px;
+      }
+      .highlight {
+        background-color: #dbeafe;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+        color: #1e40af;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-wrapper">
+      <div class="email-header">
+        <div class="logo">💰 MoneyMata</div>
+        <h1>Verify Your Email</h1>
+      </div>
+      <div class="email-body">
+        <p>Hello <strong><%= userName %></strong>,</p>
+        <p>
+          Welcome to <strong>MoneyMata</strong>! We're excited to have you on
+          board. Your smart expense tracking companion is ready to help you
+          manage your money better.
+        </p>
+        <p>
+          To get started and access all features, please verify your email
+          address by clicking the button below:
+        </p>
+        <p style="text-align: center">
+          <a href="<%= verificationLink %>" class="button"
+            >Verify Email Address</a
+          >
+        </p>
+        <p style="font-size: 14px; color: #6b7280">
+          Or copy and paste this link into your browser:
+        </p>
+        <div class="link-box"><%= verificationLink %></div>
+        <p style="margin-top: 24px">
+          This verification link will expire in
+          <span class="highlight">1 hour</span>.
+        </p>
+        <p>Once verified, you'll be able to:</p>
+        <ul style="line-height: 1.8">
+          <li>📊 Track expenses with AI-powered insights</li>
+          <li>🎤 Use voice input for quick expense entry</li>
+          <li>📸 Scan receipts with OCR technology</li>
+          <li>📈 View detailed analytics and reports</li>
+        </ul>
+        <p style="margin-top: 24px">
+          If you didn't create a MoneyMata account, please ignore this email.
+        </p>
+      </div>
+      <div class="email-footer">
+        <p>This is an automated email from MoneyMata.</p>
+        <p>
+          If you have any questions, contact us at
+          <a href="mailto:support@moneymata.com">support@moneymata.com</a>
+        </p>
+        <p style="margin-top: 16px">
+          &copy; 2025 MoneyMata. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
