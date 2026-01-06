@@ -5,24 +5,24 @@ export interface User {
   fullName: string;
   avatar?: string;
   isEmailVerified: boolean;
-  tier: 'free' | 'premium';
+  tier: "free" | "premium";
 }
 
 // Expense types
 export type ExpenseCategory =
-  | 'groceries'
-  | 'transport'
-  | 'dining'
-  | 'entertainment'
-  | 'utilities'
-  | 'healthcare'
-  | 'shopping'
-  | 'travel'
-  | 'education'
-  | 'subscriptions'
-  | 'other';
+  | "groceries"
+  | "transport"
+  | "dining"
+  | "entertainment"
+  | "utilities"
+  | "healthcare"
+  | "shopping"
+  | "travel"
+  | "education"
+  | "subscriptions"
+  | "other";
 
-export type Currency = 'NGN' | 'USD' | 'GBP';
+export type Currency = "NGN" | "USD" | "GBP";
 
 export interface Expense {
   _id: string;
@@ -63,7 +63,7 @@ export interface NotificationSettings {
 export interface UserSubscription {
   _id: string;
   userId: string;
-  tier: 'free' | 'premium';
+  tier: "free" | "premium";
   receiptsScannedThisMonth: number;
   monthResetDate: string;
   monthlyBudget?: number;
@@ -85,6 +85,7 @@ export interface CategoryBreakdown {
   amount: number;
   percentage: number;
   count: number;
+  [key: string]: any;
 }
 
 export interface MonthlyTrend {
@@ -93,7 +94,7 @@ export interface MonthlyTrend {
 }
 
 // AI Insight types
-export type InsightType = 'pattern' | 'recommendation' | 'alert';
+export type InsightType = "pattern" | "recommendation" | "alert";
 
 export interface Insight {
   type: InsightType;
@@ -112,7 +113,7 @@ export interface ApiResponse<T> {
 export interface PaginatedResponse<T> {
   success: boolean;
   data: {
-    [key: string]: T[];
+    [key: string]: any;
     pagination: {
       page: number;
       limit: number;
@@ -157,7 +158,7 @@ export interface ReceiptUploadResponse {
     category?: string;
     currency?: string;
   };
-  scansRemaining: number | 'unlimited';
+  scansRemaining: number | "unlimited";
 }
 
 // Voice parsing response

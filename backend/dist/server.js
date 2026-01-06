@@ -23,14 +23,14 @@ const PORT = process.env.PORT || 5000;
 app.use((0, helmet_1.default)());
 // CORS Configuration
 app.use((0, cors_1.default)({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
 // Body Parser
-app.use(express_1.default.json({ limit: '10mb' }));
-app.use(express_1.default.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express_1.default.json({ limit: "10mb" }));
+app.use(express_1.default.urlencoded({ extended: true, limit: "10mb" }));
 // Cookie Parser
 app.use((0, cookie_parser_1.default)());
 // Sanitize MongoDB queries
@@ -39,21 +39,29 @@ app.use((0, express_mongo_sanitize_1.default)());
 const limiter = (0, express_rate_limit_1.default)({
     windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 900000, // 15 minutes
     max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
-    message: 'Too many requests from this IP, please try again later.',
+    message: "Too many requests from this IP, please try again later.",
     standardHeaders: true,
     legacyHeaders: false,
 });
-app.use('/api', limiter);
+app.use("/api", limiter);
 // Health Check Endpoint
-app.get('/health', (req, res) => {
+app.get("/health", (req, res) => {
     res.status(200).json({
         success: true,
-        message: 'MoneyMata API is running',
-        timestamp: new Date().toISOString()
+        message: "MoneyMata API is running",
+        timestamp: new Date().toISOString(),
     });
 });
 // API Routes
-app.use('/api', routes_1.default);
+app.use("/api", routes_1.default);
+// Root route (useful for platform health checks)
+app.get("/", (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: "MoneyMata API",
+        links: { health: "/health", api: "/api" },
+    });
+});
 // 404 Handler
 app.use((req, res, next) => {
     next(new errors_1.NotFoundError(`Route ${req.originalUrl} not found`));
@@ -69,28 +77,28 @@ const startServer = async () => {
         ReminderService_1.default.start();
         // Start listening
         const server = app.listen(PORT, () => {
-            console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+            console.log(`🚀 Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`);
             console.log(`📊 Health check: http://localhost:${PORT}/health`);
             console.log(`🔗 API endpoint: http://localhost:${PORT}/api`);
         });
         // Graceful Shutdown
         const shutdown = () => {
-            console.log('\n⚠️  Shutting down gracefully...');
+            console.log("\n⚠️  Shutting down gracefully...");
             server.close(() => {
-                console.log('✅ Server closed');
+                console.log("✅ Server closed");
                 process.exit(0);
             });
             // Force close after 10 seconds
             setTimeout(() => {
-                console.error('❌ Forcing shutdown');
+                console.error("❌ Forcing shutdown");
                 process.exit(1);
             }, 10000);
         };
-        process.on('SIGTERM', shutdown);
-        process.on('SIGINT', shutdown);
+        process.on("SIGTERM", shutdown);
+        process.on("SIGINT", shutdown);
     }
     catch (error) {
-        console.error('❌ Failed to start server:', error);
+        console.error("❌ Failed to start server:", error);
         process.exit(1);
     }
 };

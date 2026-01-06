@@ -98,7 +98,7 @@ export default function ExpensesPage() {
 
   // Group expenses by date
   const groupedExpenses = expenses.reduce(
-    (groups: Record<string, Expense[]>, expense) => {
+    (groups: Record<string, Expense[]>, expense: Expense) => {
       const dateLabel = getRelativeDateLabel(expense.date);
       if (!groups[dateLabel]) {
         groups[dateLabel] = [];
@@ -106,7 +106,7 @@ export default function ExpensesPage() {
       groups[dateLabel].push(expense);
       return groups;
     },
-    {}
+    {} as Record<string, Expense[]>
   );
 
   const handleDelete = (expense: Expense) => {
@@ -203,7 +203,7 @@ export default function ExpensesPage() {
           </div>
         ) : (
           <div className="space-y-6">
-            {Object.entries(groupedExpenses).map(
+            {(Object.entries(groupedExpenses) as [string, Expense[]][]).map(
               ([dateLabel, dateExpenses]) => {
                 const dayTotal = dateExpenses.reduce(
                   (sum, exp) => sum + exp.amount,
