@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { AuthProvider } from '@/lib/hooks/useAuth';
-import { useState } from 'react';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { AuthProvider } from "@/lib/hooks/useAuth";
+import { useState } from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -23,20 +23,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-  // If no Google Client ID is provided, skip Google OAuth provider
-  if (!googleClientId) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          {children}
-          <ReactQueryDevtools initialIsOpen={false} />
-        </AuthProvider>
-      </QueryClientProvider>
-    );
-  }
-
+  // Always render a GoogleOAuthProvider so client hooks like `useGoogleLogin`
+  // can safely consume the context during CSR. If `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
+  // is not set, pass an empty string to avoid build-time errors; the
+  // provider will simply not initialize the Google script.
   return (
-    <GoogleOAuthProvider clientId={googleClientId}>
+    <GoogleOAuthProvider clientId={googleClientId ?? ""}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           {children}
