@@ -1,4 +1,4 @@
-# MoneyMata - Quick Start Guide
+# xtodolist - Quick Start Guide
 
 ## Get the Backend Running in 5 Minutes
 
@@ -16,7 +16,7 @@ NODE_ENV=development
 PORT=5000
 
 # Use local MongoDB (or get Atlas free tier)
-MONGODB_URI=mongodb://localhost:27017/moneymata
+MONGODB_URI=mongodb://localhost:27017/xtodolist
 
 # Generate random secrets (any long string)
 JWT_SECRET=my-super-secret-jwt-key-for-development-only
@@ -55,6 +55,7 @@ npm run dev
 ```
 
 You should see:
+
 ```
 🚀 Server running in development mode on port 5000
 📊 Health check: http://localhost:5000/health
@@ -68,10 +69,11 @@ curl http://localhost:5000/health
 ```
 
 Expected:
+
 ```json
 {
   "success": true,
-  "message": "MoneyMata API is running"
+  "message": "xtodolist API is running"
 }
 ```
 
@@ -144,6 +146,7 @@ curl -X GET "http://localhost:5000/api/expenses/analytics/summary" \
 ```
 
 You'll see:
+
 - Today's total spending
 - Weekly spending
 - Monthly spending
@@ -178,6 +181,7 @@ curl -X POST http://localhost:5000/api/expenses/parse-voice \
 ```
 
 Response:
+
 ```json
 {
   "success": true,
@@ -198,6 +202,7 @@ Response:
 **Problem:** `MongoNetworkError: connect ECONNREFUSED`
 
 **Solution:**
+
 - Option A: Start local MongoDB: `mongod`
 - Option B: Use MongoDB Atlas (free tier):
   1. Go to https://www.mongodb.com/cloud/atlas
@@ -210,6 +215,7 @@ Response:
 **Problem:** AI features return errors
 
 **Solution:**
+
 1. Go to https://makersuite.google.com/app/apikey
 2. Create API key (FREE)
 3. Add to `.env`: `GEMINI_API_KEY=your-key`
@@ -220,6 +226,7 @@ Response:
 **Problem:** Receipt upload returns 500 error
 
 **Solution:**
+
 1. Go to https://cloudinary.com (FREE account)
 2. Get credentials from dashboard
 3. Add to `.env`:
@@ -235,8 +242,10 @@ Response:
 **Problem:** `Error: listen EADDRINUSE: address already in use :::5000`
 
 **Solution:**
+
 - Change PORT in `.env` to `5001` or another port
 - Or kill process on port 5000:
+
   ```bash
   # Windows
   netstat -ano | findstr :5000
@@ -253,17 +262,20 @@ Response:
 Once the backend is running:
 
 1. **Install frontend dependencies:**
+
    ```bash
    cd ../frontend
    npm install
    ```
 
 2. **Create `.env.local`:**
+
    ```env
    NEXT_PUBLIC_API_URL=http://localhost:5000/api
    ```
 
 3. **The frontend foundation is ready** - you now need to build:
+
    - Auth pages (login, register)
    - Dashboard pages (home, expenses, reports, todo, settings)
    - Components (20+ UI components)
@@ -280,6 +292,7 @@ Once the backend is running:
 See `README.md` for complete API endpoint list.
 
 Quick reference:
+
 - `POST /api/auth/register` - Create account
 - `POST /api/auth/login` - Login
 - `GET /api/auth/me` - Get current user

@@ -1,4 +1,4 @@
-# MoneyMata - Expense Tracker Application
+# xtodolist - Expense Tracker Application
 
 A full-stack expense tracking application with AI-powered features, receipt OCR, voice input, and freemium subscription model.
 
@@ -9,6 +9,7 @@ A full-stack expense tracking application with AI-powered features, receipt OCR,
 The backend API is fully functional and ready to use.
 
 **Completed Components:**
+
 - ✅ Express server with middleware (CORS, helmet, rate limiting, body parser)
 - ✅ MongoDB models (User, Expense, Todo, RefreshToken, UserSubscription)
 - ✅ Authentication system (JWT with refresh tokens, Google OAuth ready)
@@ -21,6 +22,7 @@ The backend API is fully functional and ready to use.
 - ✅ Error handling and validation
 
 **API Endpoints:**
+
 ```
 Auth:
 POST   /api/auth/register
@@ -63,6 +65,7 @@ POST   /api/subscription/downgrade
 ### 🔄 FRONTEND - 40% COMPLETE
 
 **Completed:**
+
 - ✅ Next.js 15 project setup
 - ✅ TypeScript types for all entities
 - ✅ API client with auto-token refresh
@@ -70,6 +73,7 @@ POST   /api/subscription/downgrade
 - ✅ Utility functions (formatCurrency, formatDate, etc.)
 
 **Remaining (To Be Built):**
+
 - ⏳ Auth context provider
 - ⏳ React Query provider setup
 - ⏳ Login & Register pages
@@ -88,23 +92,26 @@ POST   /api/subscription/downgrade
 ### Backend Setup
 
 1. **Install dependencies:**
+
    ```bash
    cd backend
    npm install
    ```
 
 2. **Configure environment variables:**
+
    ```bash
    cp .env.example .env
    ```
 
    Edit `.env` and add:
+
    ```env
    NODE_ENV=development
    PORT=5000
 
    # MongoDB (get from MongoDB Atlas or use local)
-   MONGODB_URI=mongodb://localhost:27017/moneymata
+   MONGODB_URI=mongodb://localhost:27017/xtodolist
 
    # JWT Secrets (generate random strings)
    JWT_SECRET=your-super-secret-jwt-key-min-32-chars
@@ -125,7 +132,7 @@ POST   /api/subscription/downgrade
    EMAIL_PORT=587
    EMAIL_USER=apikey
    EMAIL_PASSWORD=your-sendgrid-api-key
-   EMAIL_FROM=noreply@moneymata.com
+   EMAIL_FROM=noreply@xtodolist.com
 
    # Frontend URL
    FRONTEND_URL=http://localhost:3000
@@ -136,7 +143,9 @@ POST   /api/subscription/downgrade
    ```
 
 3. **Start MongoDB:**
+
    - Option A: Local MongoDB
+
      ```bash
      mongod
      ```
@@ -146,6 +155,7 @@ POST   /api/subscription/downgrade
      - Get connection string and add to `MONGODB_URI`
 
 4. **Run the backend:**
+
    ```bash
    npm run dev
    ```
@@ -153,15 +163,17 @@ POST   /api/subscription/downgrade
    Backend will run on http://localhost:5000
 
 5. **Test the API:**
+
    ```bash
    curl http://localhost:5000/health
    ```
 
    Expected response:
+
    ```json
    {
      "success": true,
-     "message": "MoneyMata API is running",
+     "message": "xtodolist API is running",
      "timestamp": "2026-01-02T..."
    }
    ```
@@ -169,23 +181,27 @@ POST   /api/subscription/downgrade
 ### Frontend Setup (Current Progress)
 
 1. **Install dependencies:**
+
    ```bash
    cd frontend
    npm install
    ```
 
 2. **Configure environment:**
+
    ```bash
    cp .env.local.example .env.local
    ```
 
    Edit `.env.local`:
+
    ```env
    NEXT_PUBLIC_API_URL=http://localhost:5000/api
    NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-oauth-client-id
    ```
 
 3. **Run the frontend:**
+
    ```bash
    npm run dev
    ```
@@ -256,6 +272,7 @@ curl -X GET http://localhost:5000/api/expenses/analytics/summary \
 The backend is fully complete and tested. To finish the frontend, you need to build:
 
 ### Priority 1: Core Authentication & Layout
+
 1. **Auth Context Provider** (`lib/hooks/useAuth.tsx`)
 2. **React Query Provider** (`app/providers.tsx`)
 3. **Login Page** (`app/(auth)/login/page.tsx`)
@@ -263,7 +280,9 @@ The backend is fully complete and tested. To finish the frontend, you need to bu
 5. **Dashboard Layout** (`app/(dashboard)/layout.tsx`) with bottom navigation
 
 ### Priority 2: Main Pages
+
 6. **Home Page** (`app/(dashboard)/page.tsx`)
+
    - Spending cards (Today, Week, Month)
    - Spending chart component
    - Category breakdown component
@@ -271,6 +290,7 @@ The backend is fully complete and tested. To finish the frontend, you need to bu
    - Recent expenses list
 
 7. **Expenses Page** (`app/(dashboard)/expenses/page.tsx`)
+
    - Expense list with filters
    - Add expense modal (with voice & receipt upload)
    - Expense detail modal
@@ -283,24 +303,27 @@ The backend is fully complete and tested. To finish the frontend, you need to bu
    - Notification settings toggles
 
 ### Priority 3: Additional Features
+
 9. **Reports Page** (`app/(dashboard)/reports/page.tsx`)
 10. **Todo Page** (`app/(dashboard)/todo/page.tsx`)
 
 ### Reference Implementation
 
 Use the `.txt` files in `Pages/` and `Components/` folders as reference:
+
 - They show the UI structure and logic
 - Replace `base44` API calls with the custom API services you created
 - Convert React Router to Next.js App Router patterns
 
 Example conversion:
+
 ```jsx
 // OLD (from .txt files):
-const { data } = await base44.entities.Expense.list('-date', 100);
+const { data } = await base44.entities.Expense.list("-date", 100);
 
 // NEW (use your API services):
-import { expensesApi } from '@/lib/api/expenses';
-const { data } = await expensesApi.getExpenses({ sort: '-date', limit: 100 });
+import { expensesApi } from "@/lib/api/expenses";
+const { data } = await expensesApi.getExpenses({ sort: "-date", limit: 100 });
 ```
 
 ---
@@ -308,6 +331,7 @@ const { data } = await expensesApi.getExpenses({ sort: '-date', limit: 100 });
 ## Features
 
 ### Free Tier
+
 - ✅ Expense tracking (unlimited)
 - ✅ Voice input for expenses
 - ✅ Receipt scanning (5/month)
@@ -316,6 +340,7 @@ const { data } = await expensesApi.getExpenses({ sort: '-date', limit: 100 });
 - ✅ Multi-currency support
 
 ### Premium Tier ($4.99/month)
+
 - ✅ Unlimited receipt scanning
 - ✅ AI-powered insights (spending patterns, recommendations, alerts)
 - ✅ Budget planning & forecasts
@@ -328,6 +353,7 @@ const { data } = await expensesApi.getExpenses({ sort: '-date', limit: 100 });
 ## Tech Stack
 
 **Backend:**
+
 - Node.js + TypeScript
 - Express.js
 - MongoDB + Mongoose
@@ -337,6 +363,7 @@ const { data } = await expensesApi.getExpenses({ sort: '-date', limit: 100 });
 - Nodemailer (emails)
 
 **Frontend:**
+
 - Next.js 15 (App Router)
 - TypeScript
 - TailwindCSS
@@ -350,7 +377,7 @@ const { data } = await expensesApi.getExpenses({ sort: '-date', limit: 100 });
 ## Project Structure
 
 ```
-moneymata/
+xtodolist/
 ├── backend/                    # Express API
 │   ├── src/
 │   │   ├── config/            # Database config
@@ -405,6 +432,7 @@ moneymata/
 ## Support
 
 For questions or issues:
+
 1. Check the implementation plan at `~/.claude/plans/sharded-bouncing-galaxy.md`
 2. Review API documentation in this README
 3. Test endpoints using the curl examples above

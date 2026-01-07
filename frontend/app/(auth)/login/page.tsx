@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Loader2, Wallet } from "lucide-react";
-import { useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
+import { Blinds, Book, BookText, Loader2, Wallet } from "lucide-react";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 
 export default function LoginPage() {
   const { login, googleLogin } = useAuth();
@@ -37,7 +37,7 @@ export default function LoginPage() {
       try {
         // Get user info from Google
         const userInfoResponse = await axios.get(
-          'https://www.googleapis.com/oauth2/v3/userinfo',
+          "https://www.googleapis.com/oauth2/v3/userinfo",
           {
             headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
           }
@@ -66,19 +66,34 @@ export default function LoginPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-4">
-            <Wallet className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-blue-600 to-purple-600 rounded-2xl mb-4">
+            <BookText className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">MoneyMata</h1>
-          <p className="text-gray-600 mt-2">
-            Welcome back! Log in to your account
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900">xtodolist</h1>
+          {/* Benefits */}
+          <div className="mt-6 grid grid-cols-3 gap-3">
+            <div className="bg-gray-200 p-3 rounded-xl text-center">
+              <div className="text-2xl mb-1">🎯</div>
+              <p className="text-xs text-gray-600">Track expenses & tasks</p>
+            </div>
+            <div className="bg-gray-200 p-3 rounded-xl text-center">
+              <div className="text-2xl mb-1">🎤</div>
+              <p className="text-xs text-gray-600">Voice input</p>
+            </div>
+            <div className="bg-gray-200 p-3 rounded-xl text-center">
+              <div className="text-2xl mb-1">📊</div>
+              <p className="text-xs text-gray-600">AI insights</p>
+            </div>
+          </div>
         </div>
 
+        <p className="text-gray-600 mt-2 text-xl mb-4 font-bold">
+          Log in to your account
+        </p>
         {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -137,7 +152,9 @@ export default function LoginPage() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              <span className="px-2 bg-white text-gray-500">
+                Or continue with
+              </span>
             </div>
           </div>
 
@@ -184,13 +201,6 @@ export default function LoginPage() {
               </Link>
             </p>
           </div>
-        </div>
-
-        {/* Demo Credentials */}
-        <div className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
-          <p className="text-xs text-blue-800 text-center">
-            <strong>Demo:</strong> Use any email/password to create an account
-          </p>
         </div>
       </div>
     </div>

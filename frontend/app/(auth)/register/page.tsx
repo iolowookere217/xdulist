@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Loader2, Wallet } from "lucide-react";
-import { useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
+import { Loader2, Wallet, X } from "lucide-react"; // Added X for the modal close button
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 
 export default function RegisterPage() {
   const { register, googleLogin } = useAuth();
@@ -15,6 +15,14 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  // New state for the custom modal
+  const [showModal, setShowModal] = useState(false);
+
+  // Function to open the modal
+  const handleRestrictedClick = () => {
+    setShowModal(true);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +42,6 @@ export default function RegisterPage() {
           duration: 5000,
         }
       );
-      // Clear form
       setFullName("");
       setEmail("");
       setPassword("");
@@ -50,11 +57,11 @@ export default function RegisterPage() {
 
   const handleGoogleSignup = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
+      setShowModal(false); // Close modal if open
       setIsGoogleLoading(true);
       try {
-        // Get user info from Google
         const userInfoResponse = await axios.get(
-          'https://www.googleapis.com/oauth2/v3/userinfo',
+          "https://www.googleapis.com/oauth2/v3/userinfo",
           {
             headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
           }
@@ -83,18 +90,62 @@ export default function RegisterPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      {/* Custom Modal Backdrop */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900">
+                Sign up with Google
+              </h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-1 hover:bg-gray-100 rounded-full transition">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <p className="text-gray-600 mb-6">
+              To ensure the best experience and AI insights, we currently only
+              support signing up via Google.
+            </p>
+            <button
+              onClick={() => handleGoogleSignup()}
+              className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2">
+              Get Started with Google
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-4">
             <Wallet className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">MoneyMata</h1>
-          <p className="text-gray-600 mt-2">
-            Create your account to get started
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900">xtodolist</h1>
+
+          {/* Benefits */}
+          <div className="mt-6 grid grid-cols-3 gap-3">
+            <div className="bg-gray-200 p-3 rounded-xl text-center">
+              <div className="text-2xl mb-1">🎯</div>
+              <p className="text-xs text-gray-600">Track expenses & tasks</p>
+            </div>
+            <div className="bg-gray-200 p-3 rounded-xl text-center">
+              <div className="text-2xl mb-1">🎤</div>
+              <p className="text-xs text-gray-600">Voice input</p>
+            </div>
+            <div className="bg-gray-200 p-3 rounded-xl text-center">
+              <div className="text-2xl mb-1">📊</div>
+              <p className="text-xs text-gray-600">AI insights</p>
+            </div>
+          </div>
         </div>
+
+        <p className="text-gray-600 mt-2 text-xl mb-4 font-bold">
+          Create account
+        </p>
 
         {/* Register Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -109,9 +160,9 @@ export default function RegisterPage() {
                 id="fullName"
                 type="text"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-600"
+                readOnly
+                onClick={handleRestrictedClick}
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-400 cursor-not-allowed"
                 placeholder="John Doe"
               />
             </div>
@@ -126,9 +177,9 @@ export default function RegisterPage() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-600"
+                readOnly
+                onClick={handleRestrictedClick}
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-400 cursor-not-allowed"
                 placeholder="you@example.com"
               />
             </div>
@@ -143,10 +194,9 @@ export default function RegisterPage() {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-600"
+                readOnly
+                onClick={handleRestrictedClick}
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-400 cursor-not-allowed"
                 placeholder="••••••••"
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -156,7 +206,7 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              disabled={isLoading || isGoogleLoading}
+              disabled={true} // Form submission disabled as per request
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
               {isLoading ? (
                 <>
@@ -175,7 +225,9 @@ export default function RegisterPage() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              <span className="px-2 bg-white text-gray-500">
+                Or continue with
+              </span>
             </div>
           </div>
 
@@ -221,22 +273,6 @@ export default function RegisterPage() {
                 Log in
               </Link>
             </p>
-          </div>
-        </div>
-
-        {/* Benefits */}
-        <div className="mt-6 grid grid-cols-3 gap-3">
-          <div className="bg-white p-3 rounded-xl text-center">
-            <div className="text-2xl mb-1">🎯</div>
-            <p className="text-xs text-gray-600">Track expenses</p>
-          </div>
-          <div className="bg-white p-3 rounded-xl text-center">
-            <div className="text-2xl mb-1">🎤</div>
-            <p className="text-xs text-gray-600">Voice input</p>
-          </div>
-          <div className="bg-white p-3 rounded-xl text-center">
-            <div className="text-2xl mb-1">📊</div>
-            <p className="text-xs text-gray-600">AI insights</p>
           </div>
         </div>
       </div>

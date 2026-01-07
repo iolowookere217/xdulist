@@ -72,11 +72,10 @@ export const register = async (
     // Send verification email
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
     const verificationLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
-    await emailService.sendVerificationEmail(
-      user.email,
-      user.fullName,
-      verificationLink
-    );
+    // Send verification email asynchronously; don't block registration on SMTP issues
+    emailService
+      .sendVerificationEmail(user.email, user.fullName, verificationLink)
+      .catch((err) => console.error("Failed to send verification email:", err));
 
     res.status(201).json({
       success: true,
@@ -214,11 +213,10 @@ export const resendVerification = async (
 
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
     const verificationLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
-    await emailService.sendVerificationEmail(
-      user.email,
-      user.fullName,
-      verificationLink
-    );
+    // Send verification email asynchronously; don't fail the request if SMTP times out
+    emailService
+      .sendVerificationEmail(user.email, user.fullName, verificationLink)
+      .catch((err) => console.error("Failed to send verification email:", err));
 
     res.status(200).json({ success: true, message: "Verification email sent" });
   } catch (error) {

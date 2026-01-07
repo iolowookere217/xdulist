@@ -7,8 +7,9 @@ import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MoneyMata - Smart Expense Tracker",
-  description: "Track expenses with AI-powered insights, receipt scanning, and voice input",
+  title: "xtodolist - Smart Expense Tracker",
+  description:
+    "Track expenses and todos with voice input and AI-powered insights",
 };
 
 export default function RootLayout({

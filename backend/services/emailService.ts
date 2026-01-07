@@ -1,10 +1,12 @@
 import nodemailer from "nodemailer";
 import ejs from "ejs";
 import path from "path";
+import sgMail from "@sendgrid/mail";
 import { WeeklySummary } from "../types";
 
 class EmailService {
   private transporter: nodemailer.Transporter | null = null;
+  private sendGridEnabled = false;
   private templatesPath: string;
 
   constructor() {
@@ -22,7 +24,31 @@ class EmailService {
 
     if (process.env.EMAIL_HOST && process.env.EMAIL_USER)
       this.transporter = nodemailer.createTransport(emailConfig);
+    // Verify transporter immediately and disable it if verification fails to
+    // avoid connection timeouts bubbling up during request handling.
+    if (this.transporter) {
+      this.transporter
+        .verify()
+        .then(() => console.log("✅ Email transporter verified"))
+        .catch((err) => {
+          console.error(
+            "⚠️  Email transporter verification failed, disabling email sending:",
+            err
+          );
+          this.transporter = null;
+        });
     else
+    // Setup SendGrid if API key present
+    if (process.env.SENDGRID_API_KEY) {
+      try {
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+        this.sendGridEnabled = true;
+        console.log("✅ SendGrid API configured");
+      } catch (err) {
+        console.error("⚠️  Failed to configure SendGrid:", err);
+        this.sendGridEnabled = false;
+      }
+    }
       console.warn(
         "⚠️  Email credentials not set. Email features will be disabled."
       );
@@ -41,48 +67,22 @@ class EmailService {
     name: string,
     verificationLink: string
   ): Promise<void> {
-    if (!this.transporter) {
-      console.log("Email not sent (transporter not configured)");
-      return;
-    }
-    try {
-      const html = await this.renderTemplate("verification-email", {
-        userName: name,
-        verificationLink,
-      });
-      await this.transporter.sendMail({
-        from: process.env.EMAIL_FROM || "MoneyMata <noreply@moneymata.com>",
-        to,
-        subject: "Verify Your Email - MoneyMata",
-        html,
-      });
-    } catch (error) {
-      console.error("Failed to send verification email:", error);
-    }
+    const html = await this.renderTemplate("verification-email", {
+      userName: name,
+      verificationLink,
+    });
+    await this.sendMail({ to, subject: "Verify Your Email - MoneyMata", html });
   }
 
   async sendWelcomeEmail(to: string, name: string): Promise<void> {
-    if (!this.transporter) {
-      console.log("Email not sent (transporter not configured)");
-      return;
-    }
-    try {
-      const dashboardUrl = process.env.FRONTEND_URL
-        ? `${process.env.FRONTEND_URL}/home`
-        : "http://localhost:3000/home";
-      const html = await this.renderTemplate("welcome-email", {
-        userName: name,
-        dashboardUrl,
-      });
-      await this.transporter.sendMail({
-        from: process.env.EMAIL_FROM || "MoneyMata <noreply@moneymata.com>",
-        to,
-        subject: "Welcome to MoneyMata!",
-        html,
-      });
-    } catch (error) {
-      console.error("Failed to send welcome email:", error);
-    }
+    const dashboardUrl = process.env.FRONTEND_URL
+      ? `${process.env.FRONTEND_URL}/home`
+      : "http://localhost:3000/home";
+    const html = await this.renderTemplate("welcome-email", {
+      userName: name,
+      dashboardUrl,
+    });
+    await this.sendMail({ to, subject: "Welcome to MoneyMata!", html });
   }
 
   async sendPasswordResetEmail(
@@ -90,24 +90,11 @@ class EmailService {
     name: string,
     resetLink: string
   ): Promise<void> {
-    if (!this.transporter) {
-      console.log("Email not sent (transporter not configured)");
-      return;
-    }
-    try {
-      const html = await this.renderTemplate("password-reset-email", {
-        userName: name,
-        resetUrl: resetLink,
-      });
-      await this.transporter.sendMail({
-        from: process.env.EMAIL_FROM || "MoneyMata <noreply@moneymata.com>",
-        to,
-        subject: "Reset Your Password - MoneyMata",
-        html,
-      });
-    } catch (error) {
-      console.error("Failed to send password reset email:", error);
-    }
+    const html = await this.renderTemplate("password-reset-email", {
+      userName: name,
+      resetUrl: resetLink,
+    });
+    await this.sendMail({ to, subject: "Reset Your Password - MoneyMata", html });
   }
 
   async sendWeeklySummary(
@@ -115,31 +102,61 @@ class EmailService {
     name: string,
     stats: WeeklySummary
   ): Promise<void> {
-    if (!this.transporter) {
-      console.log("Email not sent (transporter not configured)");
-      return;
+    const dashboardUrl = process.env.FRONTEND_URL
+      ? `${process.env.FRONTEND_URL}/home`
+      : "http://localhost:3000/home";
+    const html = await this.renderTemplate("weekly-summary-email", {
+      userName: name,
+      totalSpent: stats.totalSpent,
+      transactionCount: stats.transactionCount,
+      topCategory: stats.topCategory,
+      weeklyChange: stats.weeklyChange,
+      dashboardUrl,
+    });
+    await this.sendMail({
+      to,
+      subject: "Your Weekly Spending Summary - MoneyMata",
+      html,
+    });
+  }
+
+  private async sendMail(opts: {
+    to: string;
+    subject: string;
+    html: string;
+  }): Promise<void> {
+    const from = process.env.EMAIL_FROM || "MoneyMata <noreply@moneymata.com>";
+    if (this.sendGridEnabled) {
+      try {
+        await sgMail.send({
+          to: opts.to,
+          from,
+          subject: opts.subject,
+          html: opts.html,
+        } as any);
+        return;
+      } catch (err) {
+        console.error("Failed to send email via SendGrid:", err);
+        // fallthrough to SMTP if available
+      }
     }
-    try {
-      const dashboardUrl = process.env.FRONTEND_URL
-        ? `${process.env.FRONTEND_URL}/home`
-        : "http://localhost:3000/home";
-      const html = await this.renderTemplate("weekly-summary-email", {
-        userName: name,
-        totalSpent: stats.totalSpent,
-        transactionCount: stats.transactionCount,
-        topCategory: stats.topCategory,
-        weeklyChange: stats.weeklyChange,
-        dashboardUrl,
-      });
-      await this.transporter.sendMail({
-        from: process.env.EMAIL_FROM || "MoneyMata <noreply@moneymata.com>",
-        to,
-        subject: "Your Weekly Spending Summary - MoneyMata",
-        html,
-      });
-    } catch (error) {
-      console.error("Failed to send weekly summary email:", error);
+
+    if (this.transporter) {
+      try {
+        await this.transporter.sendMail({
+          from,
+          to: opts.to,
+          subject: opts.subject,
+          html: opts.html,
+        });
+        return;
+      } catch (err) {
+        console.error("Failed to send email via SMTP transporter:", err);
+        return;
+      }
     }
+
+    console.log("Email not sent (no provider configured)");
   }
 }
 

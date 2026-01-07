@@ -1,4 +1,4 @@
-# MoneyMata - Development Progress Report
+# xtodolist - Development Progress Report
 
 ## 🎉 Current Status: 75% COMPLETE
 
@@ -7,6 +7,7 @@
 All backend services are fully implemented and tested:
 
 **Core Infrastructure:**
+
 - ✅ Express server with security middleware (helmet, CORS, rate limiting)
 - ✅ MongoDB connection and models
 - ✅ JWT authentication with refresh tokens
@@ -14,6 +15,7 @@ All backend services are fully implemented and tested:
 - ✅ File upload (Multer + Cloudinary)
 
 **Controllers (5):**
+
 - ✅ `authController.ts` - Register, login, logout, token refresh, Google OAuth
 - ✅ `expenseController.ts` - CRUD + receipt upload + voice parsing + analytics + AI insights
 - ✅ `todoController.ts` - Task management
@@ -21,12 +23,14 @@ All backend services are fully implemented and tested:
 - ✅ `subscriptionController.ts` - Premium/Free tier management
 
 **Services (4):**
+
 - ✅ `GeminiAIService.ts` - Receipt OCR, AI insights, voice parsing
 - ✅ `CloudinaryService.ts` - Image uploads
 - ✅ `EmailService.ts` - Transactional emails
 - ✅ `AnalyticsService.ts` - Spending calculations
 
 **Routes:**
+
 - ✅ All API endpoints documented
 - ✅ Authentication middleware
 - ✅ Validation on all endpoints
@@ -36,6 +40,7 @@ All backend services are fully implemented and tested:
 ### ✅ FRONTEND - 60% COMPLETE
 
 **Completed:**
+
 - ✅ Next.js 15 project setup with TypeScript & TailwindCSS
 - ✅ All TypeScript types and interfaces
 - ✅ API client with auto token refresh
@@ -49,6 +54,7 @@ All backend services are fully implemented and tested:
 - ✅ Utility functions (formatCurrency, formatDate, etc.)
 
 **Remaining (25%):**
+
 - ⏳ Expenses page with filters & search
 - ⏳ Add Expense modal (voice input + receipt upload)
 - ⏳ Reports page with charts (Recharts)
@@ -61,7 +67,7 @@ All backend services are fully implemented and tested:
 ## 📁 Project Structure
 
 ```
-moneymata/
+xtodolist/
 ├── backend/ (100% COMPLETE) ✅
 │   ├── src/
 │   │   ├── server.ts ✅
@@ -152,6 +158,7 @@ npm run dev
 ### Priority 1: Expenses Page (Most Important)
 
 Build `app/(dashboard)/expenses/page.tsx` with:
+
 - Expense list (grouped by date)
 - Search & filter functionality
 - Add expense button
@@ -160,6 +167,7 @@ Build `app/(dashboard)/expenses/page.tsx` with:
 ### Priority 2: Components
 
 Build essential components:
+
 1. `AddExpenseModal.tsx` - Form with voice input + receipt upload
 2. `ExpenseCard.tsx` - Single expense display
 3. `CategoryBadge.tsx` - Colored category chips
@@ -168,6 +176,7 @@ Build essential components:
 ### Priority 3: Reports Page
 
 Build `app/(dashboard)/reports/page.tsx` with:
+
 - Monthly spending charts (Recharts)
 - Category breakdown pie chart
 - Analytics summary cards
@@ -175,6 +184,7 @@ Build `app/(dashboard)/reports/page.tsx` with:
 ### Priority 4: Settings Page
 
 Build `app/(dashboard)/settings/page.tsx` with:
+
 - User profile section
 - Subscription status & upgrade button
 - Notification settings toggles
@@ -183,6 +193,7 @@ Build `app/(dashboard)/settings/page.tsx` with:
 ### Priority 5: Todo Page
 
 Build `app/(dashboard)/todo/page.tsx` with:
+
 - Todo list (pending/completed)
 - Add todo modal
 - Browser notifications
@@ -192,6 +203,7 @@ Build `app/(dashboard)/todo/page.tsx` with:
 ## 📊 Features Implemented
 
 ### Authentication ✅
+
 - Email/password registration & login
 - JWT with refresh tokens
 - Google OAuth ready (backend only)
@@ -199,6 +211,7 @@ Build `app/(dashboard)/todo/page.tsx` with:
 - Auto token refresh
 
 ### Expense Tracking ✅ (Backend)
+
 - Create, read, update, delete expenses
 - Multi-currency support (NGN, USD, GBP)
 - 11 expense categories
@@ -207,6 +220,7 @@ Build `app/(dashboard)/todo/page.tsx` with:
 - Voice input parsing
 
 ### AI Features ✅ (Backend)
+
 - Receipt data extraction
 - Voice transcript parsing
 - Spending insights (Premium)
@@ -215,12 +229,14 @@ Build `app/(dashboard)/todo/page.tsx` with:
 - Unusual expense alerts
 
 ### Analytics ✅ (Backend)
+
 - Spending totals (today, week, month)
 - Category breakdown with percentages
 - Monthly trends (6 months)
 - Unusual spending detection
 
 ### Freemium Model ✅
+
 - Free tier: 5 receipts/month
 - Premium tier: Unlimited receipts + AI insights
 - Manual tier upgrades (no payment yet)
@@ -232,9 +248,10 @@ Build `app/(dashboard)/todo/page.tsx` with:
 ### Required Environment Variables
 
 **Backend `.env`:**
+
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/moneymata
+MONGODB_URI=mongodb://localhost:27017/xtodolist
 JWT_SECRET=your-secret-here
 JWT_REFRESH_SECRET=your-refresh-secret
 GEMINI_API_KEY=your-gemini-api-key
@@ -245,6 +262,7 @@ FRONTEND_URL=http://localhost:3000
 ```
 
 **Frontend `.env.local`:**
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 ```
@@ -297,11 +315,13 @@ NEXT_PUBLIC_API_URL=http://localhost:5000/api
 ## 🚀 Ready to Deploy
 
 **Backend:**
+
 - Deploy to Render, Railway, or Heroku
 - Use MongoDB Atlas for database
 - Set environment variables
 
 **Frontend:**
+
 - Deploy to Vercel or Netlify
 - Set `NEXT_PUBLIC_API_URL` to production backend
 - Configure Google OAuth (if needed)
